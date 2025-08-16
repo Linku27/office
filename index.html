@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Legal File Tracker</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -61,26 +62,24 @@
         <button onclick="searchFile()">Search</button>
         <div id="search-results" class="search-results"></div>
     </div>
+
+    <!-- CSV File Download -->
+    <button onclick="downloadCSV()">Download CSV</button>
 </div>
 
 <script>
-// Store data locally, for this example we are using localStorage, you can use GitHub API or other methods to interact with the CSV file.
 let files = [];
 
-// Load data from the CSV file or from local storage if available
-function loadData() {
-    // For GitHub Pages, you cannot directly read/write to the server, so we will assume the data is manually updated via GitHub or can be fetched.
-    // You may use AJAX or fetch to pull the CSV file data into the JS or use an API.
-    // For simplicity, let's assume we are fetching the data from GitHub's raw content (not directly possible with just GitHub Pages).
+// Load initial CSV data if exists (You can pre-load CSV data here or add more manual options)
+function loadCSVData() {
+    const csvData = `case_number,name,location
+123,John Doe,Room 101
+456,Jane Smith,Room 102`;
 
-    // Placeholder data
-    files = [
-        {case_number: "123", name: "John Doe", location: "Room 101"},
-        {case_number: "456", name: "Jane Smith", location: "Room 102"},
-    ];
+    files = Papa.parse(csvData, { header: true }).data;
 }
 
-// Add a new file record
+// Add new file data to the CSV array
 function addFile() {
     const caseNumber = document.getElementById('case-number').value;
     const name = document.getElementById('name').value;
@@ -89,10 +88,8 @@ function addFile() {
     if (caseNumber && name && location) {
         const newFile = { case_number: caseNumber, name, location };
         files.push(newFile);
-        alert("File entered successfully!");
 
-        // You would typically save this to a CSV file or database here.
-        // For GitHub Pages, you would update your CSV file manually or automate with an API.
+        alert("File entered successfully!");
 
         document.getElementById('case-number').value = '';
         document.getElementById('name').value = '';
@@ -105,8 +102,9 @@ function addFile() {
 // Search for a file by case number or name
 function searchFile() {
     const query = document.getElementById('search-query').value.toLowerCase();
-    const results = files.filter(file => 
-        file.case_number.toLowerCase().includes(query) || file.name.toLowerCase().includes(query)
+    const results = files.filter(file =>
+        file.case_number.toLowerCase().includes(query) ||
+        file.name.toLowerCase().includes(query)
     );
 
     const resultsDiv = document.getElementById('search-results');
@@ -123,8 +121,19 @@ function searchFile() {
     }
 }
 
-// Initial data load
-loadData();
+// Download the CSV data
+function downloadCSV() {
+    const csv = Papa.unparse(files);
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'legal-files.csv';
+    link.click();
+}
+
+// Initialize data loading (you can also dynamically fetch data from a CSV hosted somewhere)
+loadCSVData();
 </script>
 
 </body>
