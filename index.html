@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Legal File Tracker</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -69,55 +69,87 @@
 
 <script>
 let files = [];
+let gapiLoaded = false;
 
-// Load CSV data from LocalStorage
-function loadCSVData() {
-    const storedData = localStorage.getItem('legalFiles');
-    if (storedData) {
-        files = JSON.parse(storedData);
-    } else {
-        // Initial data if LocalStorage is empty
-        files = [
-            { case_number: "123", name: "John Doe", location: "Room 101" },
-            { case_number: "456", name: "Jane Smith", location: "Room 102" }
-        ];
-    }
+// Load the Google API client and authenticate
+function loadGAPI() {
+    gapi.load('client:auth2', initializeGAPI);
 }
 
-// Add a new file record
+function initializeGAPI() {
+    gapi.auth2.init({
+        client_id: 'YOUR_CLIENT_ID.apps.googleusercontent.com', // Replace with your OAuth client ID
+    }).then(function() {
+        gapiLoaded = true;
+        console.log("Google API Client loaded and authenticated");
+    });
+}
+
+function authenticateGAPI() {
+    gapi.auth2.getAuthInstance().signIn().then(function() {
+        console.log("Signed in successfully!");
+        loadSheetData();
+    });
+}
+
+// Load data from Google Sheets
+function loadSheetData() {
+    gapi.client.init({
+        apiKey: 'YOUR_API_KEY',  // Replace with your API Key
+        clientId: 'YOUR_CLIENT_ID.apps.googleusercontent.com',
+        discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
+    }).then(function() {
+        gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId: 'YOUR_SPREADSHEET_ID', // Replace with your Google Sheets ID
+            range: 'Sheet1!A1:C', // Range of data (Case Number, Name, Location)
+        }).then(function(response) {
+            const data = response.result.values;
+            files = data.slice(1).map(row => ({
+                case_number: row[0],
+                name: row[1],
+                location: row[2]
+            }));
+            console.log(files);
+        }, function(error) {
+            console.error(error);
+        });
+    });
+}
+
+// Add a new file to Google Sheets
 function addFile() {
     const caseNumber = document.getElementById('case-number').value;
     const name = document.getElementById('name').value;
     const location = document.getElementById('location').value;
 
     if (caseNumber && name && location) {
-        const newFile = { case_number: caseNumber, name, location };
-        files.push(newFile);
+        const newFile = [caseNumber, name, location];
 
-        // Save to LocalStorage
-        localStorage.setItem('legalFiles', JSON.stringify(files));
-
-        alert("File entered successfully!");
-
-        document.getElementById('case-number').value = '';
-        document.getElementById('name').value = '';
-        document.getElementById('location').value = '';
+        gapi.client.sheets.spreadsheets.values.append({
+            spreadsheetId: 'YOUR_SPREADSHEET_ID',
+            range: 'Sheet1!A1:C',
+            valueInputOption: 'RAW',
+            values: [newFile]
+        }).then(function(response) {
+            files.push({ case_number: caseNumber, name, location });
+            alert('File added successfully!');
+        });
     } else {
-        alert("Please fill out all fields.");
+        alert('Please fill out all fields.');
     }
 }
 
-// Search for a file by case number or name
+// Search for files
 function searchFile() {
     const query = document.getElementById('search-query').value.toLowerCase();
     const results = files.filter(file =>
         file.case_number.toLowerCase().includes(query) ||
         file.name.toLowerCase().includes(query)
     );
-
+    
     const resultsDiv = document.getElementById('search-results');
     resultsDiv.innerHTML = "";
-
+    
     if (results.length > 0) {
         results.forEach(result => {
             const resultDiv = document.createElement('div');
@@ -129,7 +161,7 @@ function searchFile() {
     }
 }
 
-// Download the CSV data
+// Download CSV data
 function downloadCSV() {
     const csv = Papa.unparse(files);
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -140,8 +172,10 @@ function downloadCSV() {
     link.click();
 }
 
-// Initialize data loading
-loadCSVData();
+// Initialize Google API on page load
+window.onload = function() {
+    loadGAPI();
+};
 </script>
 
 </body>
