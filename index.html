@@ -78,7 +78,7 @@ function loadGAPI() {
 
 function initializeGAPI() {
     gapi.auth2.init({
-        client_id: 'YOUR_CLIENT_ID.apps.googleusercontent.com', // Replace with your OAuth client ID
+        client_id: '591633590989-nt349u6tg7p80vk7uc09v2d4qlue0abi.apps.googleusercontent.com', // Your Client ID here
     }).then(function() {
         gapiLoaded = true;
         console.log("Google API Client loaded and authenticated");
@@ -95,12 +95,12 @@ function authenticateGAPI() {
 // Load data from Google Sheets
 function loadSheetData() {
     gapi.client.init({
-        apiKey: 'YOUR_API_KEY',  // Replace with your API Key
-        clientId: 'YOUR_CLIENT_ID.apps.googleusercontent.com',
+        apiKey: 'AIzaSyDkzguKH7IIjt_c1AY00zRdliaojeBZ_p8',  // Your API Key here
+        clientId: '591633590989-nt349u6tg7p80vk7uc09v2d4qlue0abi.apps.googleusercontent.com',
         discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
     }).then(function() {
         gapi.client.sheets.spreadsheets.values.get({
-            spreadsheetId: 'YOUR_SPREADSHEET_ID', // Replace with your Google Sheets ID
+            spreadsheetId: '1TxzjzWwNBqgS8TaIxXhyITr6cLB3rDYZimQPeQeP5Cg', // Your Google Sheets ID
             range: 'Sheet1!A1:C', // Range of data (Case Number, Name, Location)
         }).then(function(response) {
             const data = response.result.values;
@@ -126,7 +126,7 @@ function addFile() {
         const newFile = [caseNumber, name, location];
 
         gapi.client.sheets.spreadsheets.values.append({
-            spreadsheetId: 'YOUR_SPREADSHEET_ID',
+            spreadsheetId: '1TxzjzWwNBqgS8TaIxXhyITr6cLB3rDYZimQPeQeP5Cg',
             range: 'Sheet1!A1:C',
             valueInputOption: 'RAW',
             values: [newFile]
