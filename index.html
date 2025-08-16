@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal File Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        button {
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .search-results {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Legal File Tracker</h2>
+    
+    <!-- Form to Enter Data -->
+    <div id="enter-data">
+        <h3>Enter File Data</h3>
+        <input type="text" id="case-number" placeholder="Case Number">
+        <input type="text" id="name" placeholder="Name">
+        <input type="text" id="location" placeholder="Location">
+        <button onclick="addFile()">Enter</button>
+    </div>
+
+    <!-- Search Data -->
+    <div id="search-data">
+        <h3>Search File</h3>
+        <input type="text" id="search-query" placeholder="Enter Case Number or Name">
+        <button onclick="searchFile()">Search</button>
+        <div id="search-results" class="search-results"></div>
+    </div>
+</div>
+
+<script>
+// Store data locally, for this example we are using localStorage, you can use GitHub API or other methods to interact with the CSV file.
+let files = [];
+
+// Load data from the CSV file or from local storage if available
+function loadData() {
+    // For GitHub Pages, you cannot directly read/write to the server, so we will assume the data is manually updated via GitHub or can be fetched.
+    // You may use AJAX or fetch to pull the CSV file data into the JS or use an API.
+    // For simplicity, let's assume we are fetching the data from GitHub's raw content (not directly possible with just GitHub Pages).
+
+    // Placeholder data
+    files = [
+        {case_number: "123", name: "John Doe", location: "Room 101"},
+        {case_number: "456", name: "Jane Smith", location: "Room 102"},
+    ];
+}
+
+// Add a new file record
+function addFile() {
+    const caseNumber = document.getElementById('case-number').value;
+    const name = document.getElementById('name').value;
+    const location = document.getElementById('location').value;
+
+    if (caseNumber && name && location) {
+        const newFile = { case_number: caseNumber, name, location };
+        files.push(newFile);
+        alert("File entered successfully!");
+
+        // You would typically save this to a CSV file or database here.
+        // For GitHub Pages, you would update your CSV file manually or automate with an API.
+
+        document.getElementById('case-number').value = '';
+        document.getElementById('name').value = '';
+        document.getElementById('location').value = '';
+    } else {
+        alert("Please fill out all fields.");
+    }
+}
+
+// Search for a file by case number or name
+function searchFile() {
+    const query = document.getElementById('search-query').value.toLowerCase();
+    const results = files.filter(file => 
+        file.case_number.toLowerCase().includes(query) || file.name.toLowerCase().includes(query)
+    );
+
+    const resultsDiv = document.getElementById('search-results');
+    resultsDiv.innerHTML = "";
+
+    if (results.length > 0) {
+        results.forEach(result => {
+            const resultDiv = document.createElement('div');
+            resultDiv.innerHTML = `<strong>Case Number:</strong> ${result.case_number} <strong>Name:</strong> ${result.name} <strong>Location:</strong> ${result.location}`;
+            resultsDiv.appendChild(resultDiv);
+        });
+    } else {
+        resultsDiv.innerHTML = "No results found.";
+    }
+}
+
+// Initial data load
+loadData();
+</script>
+
+</body>
+</html>
