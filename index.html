@@ -78,7 +78,7 @@ function loadGAPI() {
 
 function initializeGAPI() {
     gapi.auth2.init({
-        client_id: '591633590989-nt349u6tg7p80vk7uc09v2d4qlue0abi.apps.googleusercontent.com', // Your Client ID here
+        client_id: '448238061305-lg1rsnuukra3tal54dd6oorabo1elnb5.apps.googleusercontent.com', // New Client ID here
     }).then(function() {
         gapiLoaded = true;
         console.log("Google API Client loaded and authenticated");
@@ -95,8 +95,8 @@ function authenticateGAPI() {
 // Load data from Google Sheets
 function loadSheetData() {
     gapi.client.init({
-        apiKey: 'AIzaSyDkzguKH7IIjt_c1AY00zRdliaojeBZ_p8',  // Your API Key here
-        clientId: '591633590989-nt349u6tg7p80vk7uc09v2d4qlue0abi.apps.googleusercontent.com',
+        apiKey: 'AIzaSyANVdteltztoY3r3-4xpdF-41pMRnMfaR8',  // New API Key here
+        clientId: '448238061305-lg1rsnuukra3tal54dd6oorabo1elnb5.apps.googleusercontent.com',
         discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
     }).then(function() {
         gapi.client.sheets.spreadsheets.values.get({
