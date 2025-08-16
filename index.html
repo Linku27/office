@@ -70,16 +70,21 @@
 <script>
 let files = [];
 
-// Load initial CSV data if exists (You can pre-load CSV data here or add more manual options)
+// Load CSV data from LocalStorage
 function loadCSVData() {
-    const csvData = `case_number,name,location
-123,John Doe,Room 101
-456,Jane Smith,Room 102`;
-
-    files = Papa.parse(csvData, { header: true }).data;
+    const storedData = localStorage.getItem('legalFiles');
+    if (storedData) {
+        files = JSON.parse(storedData);
+    } else {
+        // Initial data if LocalStorage is empty
+        files = [
+            { case_number: "123", name: "John Doe", location: "Room 101" },
+            { case_number: "456", name: "Jane Smith", location: "Room 102" }
+        ];
+    }
 }
 
-// Add new file data to the CSV array
+// Add a new file record
 function addFile() {
     const caseNumber = document.getElementById('case-number').value;
     const name = document.getElementById('name').value;
@@ -88,6 +93,9 @@ function addFile() {
     if (caseNumber && name && location) {
         const newFile = { case_number: caseNumber, name, location };
         files.push(newFile);
+
+        // Save to LocalStorage
+        localStorage.setItem('legalFiles', JSON.stringify(files));
 
         alert("File entered successfully!");
 
@@ -132,7 +140,7 @@ function downloadCSV() {
     link.click();
 }
 
-// Initialize data loading (you can also dynamically fetch data from a CSV hosted somewhere)
+// Initialize data loading
 loadCSVData();
 </script>
 
